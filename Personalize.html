@@ -1,0 +1,1688 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>PearSpective · Personalize</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@400;500;600&family=Italianno&family=Caveat:wght@500&family=Playfair+Display:ital,wght@0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream-0: #F5F0E8;
+    --cream-1: #ECE5D6;
+    --cream-2: #E1D8C4;
+    --ink: #2A2620;
+    --ink-soft: #5C544A;
+    --ink-mute: #8B8378;
+    --line: #D2C9B6;
+    --line-soft: #E3DAC6;
+    --olive: #6B7548;
+    --olive-deep: #4A5535;
+    --sage: #7D8B5E;
+    --sage-deep: #4A5535;
+    --sage-soft: #B0B894;
+    --nav-ink: #FFFFFF;
+    --cream-btn: #F5E4D5;
+    --cream-btn-h: #EFD8C2;
+    --clay: #B8794A;
+    --gold: #B5934C;
+    --shadow-soft: 0 1px 2px rgba(40,30,15,0.04), 0 8px 24px rgba(40,30,15,0.06);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--cream-0); color: var(--ink); }
+  body {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+  .serif { font-family: 'Cormorant Garamond', serif; }
+  .display { font-family: 'Playfair Display', serif; }
+  .script { font-family: 'Italianno', cursive; }
+  button { font-family: inherit; cursor: pointer; }
+  input, textarea { font-family: inherit; }
+  ::selection { background: var(--sage-soft); color: var(--ink); }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    pointer-events: none;
+    background-image:
+      radial-gradient(ellipse at 20% 10%, rgba(181, 147, 76, 0.04), transparent 50%),
+      radial-gradient(ellipse at 80% 90%, rgba(107, 117, 72, 0.05), transparent 50%);
+    z-index: 0;
+  }
+  #root { position: relative; z-index: 1; }
+</style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <!-- tweaks-panel -->
+  <script type="text/babel">
+
+const __TWEAKS_STYLE = `
+  .twk-panel{position:fixed;right:16px;bottom:16px;z-index:2147483646;width:280px;
+    max-height:calc(100vh - 32px);display:flex;flex-direction:column;
+    transform:scale(var(--dc-inv-zoom,1));transform-origin:bottom right;
+    background:rgba(250,249,247,.78);color:#29261b;
+    -webkit-backdrop-filter:blur(24px) saturate(160%);backdrop-filter:blur(24px) saturate(160%);
+    border:.5px solid rgba(255,255,255,.6);border-radius:14px;
+    box-shadow:0 1px 0 rgba(255,255,255,.5) inset,0 12px 40px rgba(0,0,0,.18);
+    font:11.5px/1.4 ui-sans-serif,system-ui,-apple-system,sans-serif;overflow:hidden}
+  .twk-hd{display:flex;align-items:center;justify-content:space-between;
+    padding:10px 8px 10px 14px;cursor:move;user-select:none}
+  .twk-hd b{font-size:12px;font-weight:600;letter-spacing:.01em}
+  .twk-x{appearance:none;border:0;background:transparent;color:rgba(41,38,27,.55);
+    width:22px;height:22px;border-radius:6px;cursor:default;font-size:13px;line-height:1}
+  .twk-x:hover{background:rgba(0,0,0,.06);color:#29261b}
+  .twk-body{padding:2px 14px 14px;display:flex;flex-direction:column;gap:10px;
+    overflow-y:auto;overflow-x:hidden;min-height:0;
+    scrollbar-width:thin;scrollbar-color:rgba(0,0,0,.15) transparent}
+  .twk-body::-webkit-scrollbar{width:8px}
+  .twk-body::-webkit-scrollbar-track{background:transparent;margin:2px}
+  .twk-body::-webkit-scrollbar-thumb{background:rgba(0,0,0,.15);border-radius:4px;
+    border:2px solid transparent;background-clip:content-box}
+  .twk-body::-webkit-scrollbar-thumb:hover{background:rgba(0,0,0,.25);
+    border:2px solid transparent;background-clip:content-box}
+  .twk-row{display:flex;flex-direction:column;gap:5px}
+  .twk-row-h{flex-direction:row;align-items:center;justify-content:space-between;gap:10px}
+  .twk-lbl{display:flex;justify-content:space-between;align-items:baseline;
+    color:rgba(41,38,27,.72)}
+  .twk-lbl>span:first-child{font-weight:500}
+  .twk-val{color:rgba(41,38,27,.5);font-variant-numeric:tabular-nums}
+  .twk-sect{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+    color:rgba(41,38,27,.45);padding:10px 0 0}
+  .twk-sect:first-child{padding-top:0}
+  .twk-field{appearance:none;box-sizing:border-box;width:100%;min-width:0;height:26px;padding:0 8px;
+    border:.5px solid rgba(0,0,0,.1);border-radius:7px;
+    background:rgba(255,255,255,.6);color:inherit;font:inherit;outline:none}
+  .twk-field:focus{border-color:rgba(0,0,0,.25);background:rgba(255,255,255,.85)}
+  select.twk-field{padding-right:22px;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='rgba(0,0,0,.5)' d='M0 0h10L5 6z'/></svg>");
+    background-repeat:no-repeat;background-position:right 8px center}
+  .twk-slider{appearance:none;-webkit-appearance:none;width:100%;height:4px;margin:6px 0;
+    border-radius:999px;background:rgba(0,0,0,.12);outline:none}
+  .twk-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
+    width:14px;height:14px;border-radius:50%;background:#fff;
+    border:.5px solid rgba(0,0,0,.12);box-shadow:0 1px 3px rgba(0,0,0,.2);cursor:default}
+  .twk-slider::-moz-range-thumb{width:14px;height:14px;border-radius:50%;
+    background:#fff;border:.5px solid rgba(0,0,0,.12);box-shadow:0 1px 3px rgba(0,0,0,.2);cursor:default}
+  .twk-seg{position:relative;display:flex;padding:2px;border-radius:8px;
+    background:rgba(0,0,0,.06);user-select:none}
+  .twk-seg-thumb{position:absolute;top:2px;bottom:2px;border-radius:6px;
+    background:rgba(255,255,255,.9);box-shadow:0 1px 2px rgba(0,0,0,.12);
+    transition:left .15s cubic-bezier(.3,.7,.4,1),width .15s}
+  .twk-seg.dragging .twk-seg-thumb{transition:none}
+  .twk-seg button{appearance:none;position:relative;z-index:1;flex:1;border:0;
+    background:transparent;color:inherit;font:inherit;font-weight:500;min-height:22px;
+    border-radius:6px;cursor:default;padding:4px 6px;line-height:1.2;
+    overflow-wrap:anywhere}
+  .twk-toggle{position:relative;width:32px;height:18px;border:0;border-radius:999px;
+    background:rgba(0,0,0,.15);transition:background .15s;cursor:default;padding:0}
+  .twk-toggle[data-on="1"]{background:#34c759}
+  .twk-toggle i{position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;
+    background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .15s}
+  .twk-toggle[data-on="1"] i{transform:translateX(14px)}
+  .twk-num{display:flex;align-items:center;box-sizing:border-box;min-width:0;height:26px;padding:0 0 0 8px;
+    border:.5px solid rgba(0,0,0,.1);border-radius:7px;background:rgba(255,255,255,.6)}
+  .twk-num-lbl{font-weight:500;color:rgba(41,38,27,.6);cursor:ew-resize;
+    user-select:none;padding-right:8px}
+  .twk-num input{flex:1;min-width:0;height:100%;border:0;background:transparent;
+    font:inherit;font-variant-numeric:tabular-nums;text-align:right;padding:0 8px 0 0;
+    outline:none;color:inherit;-moz-appearance:textfield}
+  .twk-num input::-webkit-inner-spin-button,.twk-num input::-webkit-outer-spin-button{
+    -webkit-appearance:none;margin:0}
+  .twk-num-unit{padding-right:8px;color:rgba(41,38,27,.45)}
+  .twk-btn{appearance:none;height:26px;padding:0 12px;border:0;border-radius:7px;
+    background:rgba(0,0,0,.78);color:#fff;font:inherit;font-weight:500;cursor:default}
+  .twk-btn:hover{background:rgba(0,0,0,.88)}
+  .twk-btn.secondary{background:rgba(0,0,0,.06);color:inherit}
+  .twk-btn.secondary:hover{background:rgba(0,0,0,.1)}
+  .twk-swatch{appearance:none;-webkit-appearance:none;width:56px;height:22px;
+    border:.5px solid rgba(0,0,0,.1);border-radius:6px;padding:0;cursor:default;
+    background:transparent;flex-shrink:0}
+  .twk-swatch::-webkit-color-swatch-wrapper{padding:0}
+  .twk-swatch::-webkit-color-swatch{border:0;border-radius:5.5px}
+  .twk-swatch::-moz-color-swatch{border:0;border-radius:5.5px}
+  .twk-chips{display:flex;gap:6px}
+  .twk-chip{position:relative;appearance:none;flex:1;min-width:0;height:46px;
+    padding:0;border:0;border-radius:6px;overflow:hidden;cursor:default;
+    box-shadow:0 0 0 .5px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.06);
+    transition:transform .12s cubic-bezier(.3,.7,.4,1),box-shadow .12s}
+  .twk-chip:hover{transform:translateY(-1px);
+    box-shadow:0 0 0 .5px rgba(0,0,0,.18),0 4px 10px rgba(0,0,0,.12)}
+  .twk-chip[data-on="1"]{box-shadow:0 0 0 1.5px rgba(0,0,0,.85),
+    0 2px 6px rgba(0,0,0,.15)}
+  .twk-chip>span{position:absolute;top:0;bottom:0;right:0;width:34%;
+    display:flex;flex-direction:column;box-shadow:-1px 0 0 rgba(0,0,0,.1)}
+  .twk-chip>span>i{flex:1;box-shadow:0 -1px 0 rgba(0,0,0,.1)}
+  .twk-chip>span>i:first-child{box-shadow:none}
+  .twk-chip svg{position:absolute;top:6px;left:6px;width:13px;height:13px;
+    filter:drop-shadow(0 1px 1px rgba(0,0,0,.3))}
+`;
+
+function useTweaks(defaults) {
+  const [values, setValues] = React.useState(defaults);
+  const setTweak = React.useCallback((keyOrEdits, val) => {
+    const edits = typeof keyOrEdits === 'object' && keyOrEdits !== null
+      ? keyOrEdits : { [keyOrEdits]: val };
+    setValues((prev) => ({ ...prev, ...edits }));
+    window.parent.postMessage({ type: '__edit_mode_set_keys', edits }, '*');
+    window.dispatchEvent(new CustomEvent('tweakchange', { detail: edits }));
+  }, []);
+  return [values, setTweak];
+}
+
+function TweaksPanel({ title = 'Tweaks', children }) {
+  const [open, setOpen] = React.useState(false);
+  const dragRef = React.useRef(null);
+  const offsetRef = React.useRef({ x: 16, y: 16 });
+  const PAD = 16;
+
+  const clampToViewport = React.useCallback(() => {
+    const panel = dragRef.current;
+    if (!panel) return;
+    const w = panel.offsetWidth, h = panel.offsetHeight;
+    const maxRight = Math.max(PAD, window.innerWidth - w - PAD);
+    const maxBottom = Math.max(PAD, window.innerHeight - h - PAD);
+    offsetRef.current = {
+      x: Math.min(maxRight, Math.max(PAD, offsetRef.current.x)),
+      y: Math.min(maxBottom, Math.max(PAD, offsetRef.current.y)),
+    };
+    panel.style.right = offsetRef.current.x + 'px';
+    panel.style.bottom = offsetRef.current.y + 'px';
+  }, []);
+
+  React.useEffect(() => {
+    if (!open) return;
+    clampToViewport();
+    if (typeof ResizeObserver === 'undefined') {
+      window.addEventListener('resize', clampToViewport);
+      return () => window.removeEventListener('resize', clampToViewport);
+    }
+    const ro = new ResizeObserver(clampToViewport);
+    ro.observe(document.documentElement);
+    return () => ro.disconnect();
+  }, [open, clampToViewport]);
+
+  React.useEffect(() => {
+    const onMsg = (e) => {
+      const t = e?.data?.type;
+      if (t === '__activate_edit_mode') setOpen(true);
+      else if (t === '__deactivate_edit_mode') setOpen(false);
+    };
+    window.addEventListener('message', onMsg);
+    window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+    return () => window.removeEventListener('message', onMsg);
+  }, []);
+
+  const dismiss = () => {
+    setOpen(false);
+    window.parent.postMessage({ type: '__edit_mode_dismissed' }, '*');
+  };
+
+  const onDragStart = (e) => {
+    const panel = dragRef.current;
+    if (!panel) return;
+    const r = panel.getBoundingClientRect();
+    const sx = e.clientX, sy = e.clientY;
+    const startRight = window.innerWidth - r.right;
+    const startBottom = window.innerHeight - r.bottom;
+    const move = (ev) => {
+      offsetRef.current = {
+        x: startRight - (ev.clientX - sx),
+        y: startBottom - (ev.clientY - sy),
+      };
+      clampToViewport();
+    };
+    const up = () => {
+      window.removeEventListener('mousemove', move);
+      window.removeEventListener('mouseup', up);
+    };
+    window.addEventListener('mousemove', move);
+    window.addEventListener('mouseup', up);
+  };
+
+  if (!open) return null;
+  return (
+    <>
+      <style>{__TWEAKS_STYLE}</style>
+      <div ref={dragRef} className="twk-panel" data-omelette-chrome=""
+           style={{ right: offsetRef.current.x, bottom: offsetRef.current.y }}>
+        <div className="twk-hd" onMouseDown={onDragStart}>
+          <b>{title}</b>
+          <button className="twk-x" aria-label="Close tweaks"
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onClick={dismiss}>✕</button>
+        </div>
+        <div className="twk-body">
+          {children}
+        </div>
+      </div>
+    </>
+  );
+}
+
+function TweakSection({ label, children }) {
+  return (
+    <>
+      <div className="twk-sect">{label}</div>
+      {children}
+    </>
+  );
+}
+
+function TweakRow({ label, value, children, inline = false }) {
+  return (
+    <div className={inline ? 'twk-row twk-row-h' : 'twk-row'}>
+      <div className="twk-lbl">
+        <span>{label}</span>
+        {value != null && <span className="twk-val">{value}</span>}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function TweakSlider({ label, value, min = 0, max = 100, step = 1, unit = '', onChange }) {
+  return (
+    <TweakRow label={label} value={`${value}${unit}`}>
+      <input type="range" className="twk-slider" min={min} max={max} step={step}
+             value={value} onChange={(e) => onChange(Number(e.target.value))} />
+    </TweakRow>
+  );
+}
+
+function TweakToggle({ label, value, onChange }) {
+  return (
+    <div className="twk-row twk-row-h">
+      <div className="twk-lbl"><span>{label}</span></div>
+      <button type="button" className="twk-toggle" data-on={value ? '1' : '0'}
+              role="switch" aria-checked={!!value}
+              onClick={() => onChange(!value)}><i /></button>
+    </div>
+  );
+}
+
+function TweakRadio({ label, value, options, onChange }) {
+  const trackRef = React.useRef(null);
+  const [dragging, setDragging] = React.useState(false);
+  const valueRef = React.useRef(value);
+  valueRef.current = value;
+
+  const labelLen = (o) => String(typeof o === 'object' ? o.label : o).length;
+  const maxLen = options.reduce((m, o) => Math.max(m, labelLen(o)), 0);
+  const fitsAsSegments = maxLen <= ({ 2: 16, 3: 10 }[options.length] ?? 0);
+  if (!fitsAsSegments) {
+    const resolve = (s) => {
+      const m = options.find((o) => String(typeof o === 'object' ? o.value : o) === s);
+      return m === undefined ? s : typeof m === 'object' ? m.value : m;
+    };
+    return <TweakSelect label={label} value={value} options={options}
+                        onChange={(s) => onChange(resolve(s))} />;
+  }
+  const opts = options.map((o) => (typeof o === 'object' ? o : { value: o, label: o }));
+  const idx = Math.max(0, opts.findIndex((o) => o.value === value));
+  const n = opts.length;
+
+  const segAt = (clientX) => {
+    const r = trackRef.current.getBoundingClientRect();
+    const inner = r.width - 4;
+    const i = Math.floor(((clientX - r.left - 2) / inner) * n);
+    return opts[Math.max(0, Math.min(n - 1, i))].value;
+  };
+
+  const onPointerDown = (e) => {
+    setDragging(true);
+    const v0 = segAt(e.clientX);
+    if (v0 !== valueRef.current) onChange(v0);
+    const move = (ev) => {
+      if (!trackRef.current) return;
+      const v = segAt(ev.clientX);
+      if (v !== valueRef.current) onChange(v);
+    };
+    const up = () => {
+      setDragging(false);
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+  };
+
+  return (
+    <TweakRow label={label}>
+      <div ref={trackRef} role="radiogroup" onPointerDown={onPointerDown}
+           className={dragging ? 'twk-seg dragging' : 'twk-seg'}>
+        <div className="twk-seg-thumb"
+             style={{ left: `calc(2px + ${idx} * (100% - 4px) / ${n})`,
+                      width: `calc((100% - 4px) / ${n})` }} />
+        {opts.map((o) => (
+          <button key={o.value} type="button" role="radio" aria-checked={o.value === value}>
+            {o.label}
+          </button>
+        ))}
+      </div>
+    </TweakRow>
+  );
+}
+
+function TweakSelect({ label, value, options, onChange }) {
+  return (
+    <TweakRow label={label}>
+      <select className="twk-field" value={value} onChange={(e) => onChange(e.target.value)}>
+        {options.map((o) => {
+          const v = typeof o === 'object' ? o.value : o;
+          const l = typeof o === 'object' ? o.label : o;
+          return <option key={v} value={v}>{l}</option>;
+        })}
+      </select>
+    </TweakRow>
+  );
+}
+
+function TweakText({ label, value, placeholder, onChange }) {
+  return (
+    <TweakRow label={label}>
+      <input className="twk-field" type="text" value={value} placeholder={placeholder}
+             onChange={(e) => onChange(e.target.value)} />
+    </TweakRow>
+  );
+}
+
+function TweakNumber({ label, value, min, max, step = 1, unit = '', onChange }) {
+  const clamp = (n) => {
+    if (min != null && n < min) return min;
+    if (max != null && n > max) return max;
+    return n;
+  };
+  const startRef = React.useRef({ x: 0, val: 0 });
+  const onScrubStart = (e) => {
+    e.preventDefault();
+    startRef.current = { x: e.clientX, val: value };
+    const decimals = (String(step).split('.')[1] || '').length;
+    const move = (ev) => {
+      const dx = ev.clientX - startRef.current.x;
+      const raw = startRef.current.val + dx * step;
+      const snapped = Math.round(raw / step) * step;
+      onChange(clamp(Number(snapped.toFixed(decimals))));
+    };
+    const up = () => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+  };
+  return (
+    <div className="twk-num">
+      <span className="twk-num-lbl" onPointerDown={onScrubStart}>{label}</span>
+      <input type="number" value={value} min={min} max={max} step={step}
+             onChange={(e) => onChange(clamp(Number(e.target.value)))} />
+      {unit && <span className="twk-num-unit">{unit}</span>}
+    </div>
+  );
+}
+
+function __twkIsLight(hex) {
+  const h = String(hex).replace('#', '');
+  const x = h.length === 3 ? h.replace(/./g, (c) => c + c) : h.padEnd(6, '0');
+  const n = parseInt(x.slice(0, 6), 16);
+  if (Number.isNaN(n)) return true;
+  const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+  return r * 299 + g * 587 + b * 114 > 148000;
+}
+
+const __TwkCheck = ({ light }) => (
+  <svg viewBox="0 0 14 14" aria-hidden="true">
+    <path d="M3 7.2 5.8 10 11 4.2" fill="none" strokeWidth="2.2"
+          strokeLinecap="round" strokeLinejoin="round"
+          stroke={light ? 'rgba(0,0,0,.78)' : '#fff'} />
+  </svg>
+);
+
+function TweakColor({ label, value, options, onChange }) {
+  if (!options || !options.length) {
+    return (
+      <div className="twk-row twk-row-h">
+        <div className="twk-lbl"><span>{label}</span></div>
+        <input type="color" className="twk-swatch" value={value}
+               onChange={(e) => onChange(e.target.value)} />
+      </div>
+    );
+  }
+  const key = (o) => String(JSON.stringify(o)).toLowerCase();
+  const cur = key(value);
+  return (
+    <TweakRow label={label}>
+      <div className="twk-chips" role="radiogroup">
+        {options.map((o, i) => {
+          const colors = Array.isArray(o) ? o : [o];
+          const [hero, ...rest] = colors;
+          const sup = rest.slice(0, 4);
+          const on = key(o) === cur;
+          return (
+            <button key={i} type="button" className="twk-chip" role="radio"
+                    aria-checked={on} data-on={on ? '1' : '0'}
+                    aria-label={colors.join(', ')} title={colors.join(' · ')}
+                    style={{ background: hero }}
+                    onClick={() => onChange(o)}>
+              {sup.length > 0 && (
+                <span>
+                  {sup.map((c, j) => <i key={j} style={{ background: c }} />)}
+                </span>
+              )}
+              {on && <__TwkCheck light={__twkIsLight(hero)} />}
+            </button>
+          );
+        })}
+      </div>
+    </TweakRow>
+  );
+}
+
+function TweakButton({ label, onClick, secondary = false }) {
+  return (
+    <button type="button" className={secondary ? 'twk-btn secondary' : 'twk-btn'}
+            onClick={onClick}>{label}</button>
+  );
+}
+
+Object.assign(window, {
+  useTweaks, TweaksPanel, TweakSection, TweakRow,
+  TweakSlider, TweakToggle, TweakRadio, TweakSelect,
+  TweakText, TweakNumber, TweakColor, TweakButton,
+});
+  </script>
+
+  <!-- preview: product data + engraving preview components -->
+  <script type="text/babel">
+
+const PRODUCTS = {
+  bracelet: {
+    id: 'bracelet',
+    name: 'Hà · Mother-of-Pearl Cuff',
+    subtitle: 'Sterling silver · Hand-set nacre',
+    photo: 'assets/bracelet.jpg',
+    price: 168,
+    insideLengthMm: 58,
+    insideMaxChars: 22,
+    sides: ['INSIDE'],
+    description: 'Cast in sterling silver with an organic molten silhouette. A single nacre stone holds a constellation of hand-pricked stars.',
+  },
+  ring: {
+    id: 'ring',
+    name: 'Vũ · Mother-of-Pearl Signet Ring',
+    subtitle: 'Sterling silver · Adjustable band',
+    photo: 'assets/ring.jpg',
+    price: 96,
+    insideLengthMm: 38,
+    insideMaxChars: 16,
+    sides: ['INSIDE'],
+    description: 'A cast silver band with the same liquid-silver texture and a smaller nacre cabochon. Adjustable. Engraving sits along the inside band.',
+  },
+};
+
+const FONTS = [
+  { id: 'serif',   name: 'Cormorant',  css: "'Cormorant Garamond', serif",   weight: 500, italic: false },
+  { id: 'italic',  name: 'Italic',     css: "'Cormorant Garamond', serif",   weight: 500, italic: true },
+  { id: 'script',  name: 'Italianno',  css: "'Italianno', cursive",           weight: 400, italic: false, scale: 1.7 },
+  { id: 'hand',    name: 'Caveat',     css: "'Caveat', cursive",              weight: 500, italic: false, scale: 1.05 },
+  { id: 'display', name: 'Playfair',   css: "'Playfair Display', serif",      weight: 600, italic: false },
+  { id: 'sans',    name: 'DM Sans',    css: "'DM Sans', sans-serif",          weight: 500, italic: false, scale: 0.92 },
+  { id: 'mono',    name: 'Mono',       css: "'JetBrains Mono', ui-monospace, monospace", weight: 500, italic: false, scale: 0.88 },
+];
+
+const ICONS = [
+  { id: 'star',   label: 'Star',   path: 'M0 -8 L2 -2 L8 -2 L3 2 L5 8 L0 4 L-5 8 L-3 2 L-8 -2 L-2 -2 Z' },
+  { id: 'moon',   label: 'Moon',   path: 'M-6 0 A6 6 0 1 0 4 -4 A4 4 0 1 1 -6 0 Z' },
+  { id: 'leaf',   label: 'Leaf',   path: 'M0 -8 Q7 -3 0 8 Q-7 -3 0 -8 Z M0 -6 L0 6' },
+  { id: 'heart',  label: 'Heart',  path: 'M0 5 Q-6 0 -6 -3 A3 3 0 0 1 0 -3 A3 3 0 0 1 6 -3 Q6 0 0 5 Z' },
+  { id: 'sun',    label: 'Sun',    path: 'M0 -6 L1 -3 L4 -4 L3 -1 L6 0 L3 1 L4 4 L1 3 L0 6 L-1 3 L-4 4 L-3 1 L-6 0 L-3 -1 L-4 -4 L-1 -3 Z' },
+  { id: 'wave',   label: 'Wave',   path: 'M-7 0 Q-4 -3 -1 0 T 7 0', stroke: true },
+  { id: 'infin',  label: 'Infin.', path: 'M-3 0 A3 3 0 1 1 0 0 A3 3 0 1 0 3 0 A3 3 0 1 1 0 0 A3 3 0 1 0 -3 0 Z', stroke: true },
+  { id: 'circle', label: 'Dot',    path: 'M0 -2 A2 2 0 1 1 0 2 A2 2 0 1 1 0 -2 Z' },
+];
+
+function IconGlyph({ id, size = 16, color = '#3a3530' }) {
+  const ic = ICONS.find(i => i.id === id);
+  if (!ic) return null;
+  return (
+    <svg width={size} height={size} viewBox="-10 -10 20 20" style={{ verticalAlign: 'middle' }}>
+      <path d={ic.path}
+        fill={ic.stroke ? 'none' : color}
+        stroke={color}
+        strokeWidth={ic.stroke ? 1.4 : 0.6}
+        strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function ContentTokens({ content, font, size, color }) {
+  const f = FONTS.find(x => x.id === font) || FONTS[0];
+  const fs = size * (f.scale || 1);
+  const parts = [];
+  const re = /:([a-z]+):/g;
+  let last = 0; let m; let i = 0;
+  while ((m = re.exec(content)) !== null) {
+    if (m.index > last) parts.push({ k: 'txt', v: content.slice(last, m.index), i: i++ });
+    parts.push({ k: 'ico', v: m[1], i: i++ });
+    last = re.lastIndex;
+  }
+  if (last < content.length) parts.push({ k: 'txt', v: content.slice(last), i: i++ });
+  return (
+    <span style={{
+      fontFamily: f.css,
+      fontStyle: f.italic ? 'italic' : 'normal',
+      fontWeight: f.weight,
+      fontSize: fs,
+      color,
+      letterSpacing: '0.02em',
+      whiteSpace: 'pre',
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: '0.18em',
+    }}>
+      {parts.map(p => p.k === 'txt'
+        ? <span key={p.i}>{p.v}</span>
+        : <IconGlyph key={p.i} id={p.v} size={fs * 0.9} color={color} />)}
+    </span>
+  );
+}
+
+function InsideStrip({ product, content, font, size }) {
+  const px = product.insideLengthMm * 9;
+  const h = product.id === 'ring' ? 72 : 96;
+  return (
+    <div style={{
+      position: 'relative',
+      width: '100%',
+      maxWidth: px,
+      height: h,
+      margin: '0 auto',
+      borderRadius: h / 2,
+      background: `linear-gradient(180deg,
+        #d4d2cd 0%,
+        #efece6 22%,
+        #cfccc4 50%,
+        #efece6 78%,
+        #b8b5ad 100%)`,
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6), inset 0 -1px 0 rgba(0,0,0,0.15), 0 14px 30px -18px rgba(40,30,15,0.45)',
+      overflow: 'hidden',
+    }}>
+      <div style={{
+        position: 'absolute', inset: 0,
+        backgroundImage: 'repeating-linear-gradient(90deg, rgba(255,255,255,0.18) 0 0.5px, transparent 0.5px 3px)',
+        opacity: 0.5,
+        pointerEvents: 'none',
+      }} />
+      <div style={{
+        position: 'absolute', left: 6, right: 6, top: 6, bottom: 6,
+        borderRadius: (h-12)/2,
+        border: '1px solid rgba(0,0,0,0.08)',
+        boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.4)',
+        pointerEvents: 'none',
+      }} />
+      <div style={{
+        position: 'absolute', inset: 0,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        padding: '0 28px',
+      }}>
+        <div style={{
+          filter: 'drop-shadow(0 0.5px 0 rgba(255,255,255,0.5)) drop-shadow(0 -0.3px 0 rgba(0,0,0,0.35))',
+          maxWidth: '100%',
+          whiteSpace: 'nowrap',
+        }}>
+          <ContentTokens content={content || ' '} font={font} size={size} color="#2e2a25" />
+        </div>
+      </div>
+      <div style={{ position: 'absolute', left: -2, top: 0, bottom: 0, width: 2, background: 'rgba(0,0,0,0.18)' }} />
+      <div style={{ position: 'absolute', right: -2, top: 0, bottom: 0, width: 2, background: 'rgba(0,0,0,0.18)' }} />
+    </div>
+  );
+}
+
+function InsideArc({ product, content, font, size }) {
+  const f = FONTS.find(x => x.id === font) || FONTS[0];
+  const fs = (size * 0.55) * (f.scale || 1);
+  const r = product.id === 'ring' ? 80 : 100;
+  const pathId = `arc-${product.id}`;
+  const plain = (content || '').replace(/:[a-z]+:/g, '·');
+  return (
+    <svg viewBox="-120 -50 240 120" width="100%" height="100%">
+      <defs>
+        <linearGradient id={`${pathId}-g`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#cfcdc7" />
+          <stop offset="50%" stopColor="#f1eee8" />
+          <stop offset="100%" stopColor="#b5b2aa" />
+        </linearGradient>
+        <path id={pathId} d={`M ${-r} 10 A ${r} ${r*0.45} 0 0 1 ${r} 10`} />
+      </defs>
+      <path d={`M ${-r-14} 14 A ${r+14} ${(r+14)*0.45} 0 0 1 ${r+14} 14
+                 L ${r} 14 A ${r} ${r*0.45} 0 0 0 ${-r} 14 Z`}
+        fill={`url(#${pathId}-g)`} stroke="#7a7770" strokeWidth="0.6" />
+      <text fontFamily={f.css} fontStyle={f.italic ? 'italic' : 'normal'}
+            fontWeight={f.weight} fontSize={fs} fill="#2e2a25" letterSpacing="0.5">
+        <textPath href={`#${pathId}`} startOffset="50%" textAnchor="middle">
+          {plain || ' '}
+        </textPath>
+      </text>
+    </svg>
+  );
+}
+
+function visibleLength(s) {
+  return (s || '').replace(/:[a-z]+:/g, 'X').length;
+}
+
+Object.assign(window, {
+  PRODUCTS, FONTS, ICONS,
+  IconGlyph, ContentTokens, InsideStrip, InsideArc, visibleLength,
+});
+  </script>
+
+  <!-- steps: Stepper + all step screens -->
+  <script type="text/babel">
+const { useState: useStateS, useMemo } = React;
+
+function Stepper({ steps, current }) {
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      gap: 0, padding: '20px 0',
+      borderTop: '1px solid var(--line-soft)',
+      borderBottom: '1px solid var(--line-soft)',
+      background: 'rgba(245,240,232,0.6)',
+    }}>
+      {steps.map((s, i) => {
+        const done = i < current;
+        const active = i === current;
+        return (
+          <React.Fragment key={s}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{
+                width: 26, height: 26, borderRadius: '50%',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontFamily: "'Cormorant Garamond', serif",
+                fontSize: 14, fontWeight: 600,
+                background: active ? 'var(--sage)' : done ? 'var(--cream-1)' : 'transparent',
+                color: active ? '#fff' : done ? 'var(--sage)' : 'var(--ink-mute)',
+                border: active ? '1px solid var(--sage)' : done ? '1px solid var(--sage)' : '1px solid var(--line)',
+                transition: 'all 240ms ease',
+              }}>{done ? '✓' : i + 1}</div>
+              <div style={{
+                fontSize: 11.5, letterSpacing: '0.18em', textTransform: 'uppercase',
+                color: active ? 'var(--ink)' : done ? 'var(--ink-soft)' : 'var(--ink-mute)',
+                fontWeight: active ? 600 : 400,
+              }}>{s}</div>
+            </div>
+            {i < steps.length - 1 && (
+              <div style={{ width: 56, height: 1, background: done ? 'var(--sage-soft)' : 'var(--line)', margin: '0 22px' }} />
+            )}
+          </React.Fragment>
+        );
+      })}
+    </div>
+  );
+}
+
+function Chip({ children, on, onClick, style }) {
+  return (
+    <button onClick={onClick} style={{
+      padding: '8px 14px',
+      borderRadius: 999,
+      border: on ? '1px solid var(--sage)' : '1px solid var(--line)',
+      background: on ? 'var(--sage)' : 'transparent',
+      color: on ? '#fff' : 'var(--ink-soft)',
+      fontSize: 12, letterSpacing: '0.06em',
+      cursor: 'pointer',
+      transition: 'all 180ms ease',
+      ...style,
+    }}>{children}</button>
+  );
+}
+
+function PrimaryButton({ children, onClick, disabled, style }) {
+  return (
+    <button onClick={onClick} disabled={disabled} style={{
+      padding: '14px 28px',
+      background: disabled ? 'var(--cream-2)' : '#000',
+      color: disabled ? 'var(--ink-mute)' : '#fff',
+      border: 'none',
+      borderRadius: 0,
+      fontSize: 12,
+      letterSpacing: '0.18em',
+      fontWeight: 500,
+      cursor: disabled ? 'not-allowed' : 'pointer',
+      transition: 'background 200ms ease',
+      ...style,
+    }}>{children}</button>
+  );
+}
+
+function SecondaryButton({ children, onClick, disabled, style }) {
+  return (
+    <button onClick={onClick} disabled={disabled} style={{
+      padding: '14px 28px',
+      background: disabled ? 'var(--cream-2)' : 'var(--cream-btn)',
+      color: 'var(--ink)',
+      border: 'none',
+      borderRadius: 0,
+      fontSize: 12,
+      letterSpacing: '0.18em',
+      fontWeight: 500,
+      cursor: disabled ? 'not-allowed' : 'pointer',
+      transition: 'background 200ms ease',
+      ...style,
+    }}>{children}</button>
+  );
+}
+
+function GhostButton({ children, onClick, style }) {
+  return (
+    <button onClick={onClick} style={{
+      padding: '14px 28px',
+      background: 'transparent',
+      color: 'var(--ink-soft)',
+      border: '1px solid var(--line)',
+      borderRadius: 0,
+      fontSize: 12,
+      letterSpacing: '0.16em',
+      fontWeight: 500,
+      cursor: 'pointer',
+      transition: 'all 200ms ease',
+      ...style,
+    }}>{children}</button>
+  );
+}
+
+// =============================================================================
+// STEP 1 — Pick product
+// =============================================================================
+function StepProduct({ cfg, setCfg, onNext }) {
+  return (
+    <div style={{ padding: '48px 64px 32px', maxWidth: 1180, margin: '0 auto' }}>
+      <div style={{ textAlign: 'center', marginBottom: 48 }}>
+        <h2 className="display" style={{
+          fontSize: 42, fontWeight: 500, fontStyle: 'italic', margin: 0,
+          letterSpacing: '0.005em', color: 'var(--ink)',
+        }}>Choose a piece to engrave</h2>
+        <p style={{ marginTop: 14, color: 'var(--ink-soft)', fontSize: 14.5, maxWidth: 520, marginLeft: 'auto', marginRight: 'auto' }}>
+          Each piece is cast in sterling silver and finished by hand. Your inscription is etched on the inside surface — close to skin, just for you.
+        </p>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 28 }}>
+        {Object.values(PRODUCTS).map(p => {
+          const on = cfg.productId === p.id;
+          return (
+            <button
+              key={p.id}
+              onClick={() => setCfg({ ...cfg, productId: p.id })}
+              style={{
+                padding: 0,
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                textAlign: 'left',
+                fontFamily: 'inherit',
+              }}>
+              <div style={{
+                position: 'relative',
+                aspectRatio: '1 / 1',
+                background: '#dde3d4',
+                overflow: 'hidden',
+                border: on ? '1px solid var(--sage)' : '1px solid transparent',
+                outline: on ? '6px solid rgba(107,117,72,0.12)' : 'none',
+                outlineOffset: 0,
+                transition: 'all 200ms ease',
+              }}>
+                <img src={p.photo} alt={p.name}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                <div style={{
+                  position: 'absolute', top: 14, left: 14,
+                  padding: '5px 10px',
+                  background: 'rgba(245,240,232,0.92)',
+                  fontSize: 10, letterSpacing: '0.24em', textTransform: 'uppercase',
+                  color: 'var(--ink-soft)',
+                }}>{p.id === 'bracelet' ? 'Cuff bracelet' : 'Signet ring'}</div>
+                {on && (
+                  <div style={{
+                    position: 'absolute', top: 14, right: 14,
+                    width: 28, height: 28, borderRadius: '50%',
+                    background: 'var(--sage)',
+                    color: '#fff',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 13,
+                  }}>✓</div>
+                )}
+              </div>
+              <div style={{ paddingTop: 18, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 }}>
+                <div>
+                  <div className="display" style={{ fontSize: 22, fontWeight: 500 }}>{p.name}</div>
+                  <div style={{ marginTop: 4, fontSize: 12, color: 'var(--ink-mute)', letterSpacing: '0.06em' }}>{p.subtitle}</div>
+                </div>
+                <div className="serif" style={{ fontSize: 22, fontWeight: 500 }}>${p.price}</div>
+              </div>
+              <p style={{ marginTop: 10, color: 'var(--ink-soft)', fontSize: 13.5, lineHeight: 1.55 }}>
+                {p.description}
+              </p>
+              <div style={{ marginTop: 10, fontSize: 11.5, color: 'var(--sage)', letterSpacing: '0.14em', textTransform: 'uppercase' }}>
+                Inside surface · {p.insideLengthMm}mm · up to {p.insideMaxChars} chars
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
+      <div style={{ marginTop: 56, display: 'flex', justifyContent: 'center' }}>
+        <PrimaryButton onClick={onNext} disabled={!cfg.productId}>
+          Personalize this piece →
+        </PrimaryButton>
+      </div>
+    </div>
+  );
+}
+
+// =============================================================================
+// STEP 2 — Engrave editor
+// =============================================================================
+function StepEngrave({ cfg, setCfg, onBack, onNext }) {
+  const product = PRODUCTS[cfg.productId];
+  const [tab, setTab] = useStateS('fonts');
+  const len = visibleLength(cfg.content);
+  const overflow = len > product.insideMaxChars;
+
+  function setContent(v) {
+    setCfg({ ...cfg, content: v });
+  }
+  function addIcon(id) {
+    setCfg({ ...cfg, content: (cfg.content || '') + ` :${id}: ` });
+  }
+
+  return (
+    <div style={{ padding: '40px 56px', maxWidth: 1280, margin: '0 auto' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 480px', gap: 56, alignItems: 'start' }}>
+
+        {/* LEFT — preview */}
+        <div>
+          <div style={{ fontSize: 11, letterSpacing: '0.32em', color: 'var(--olive)', textTransform: 'uppercase', marginBottom: 10 }}>
+            Step 2 · Inside engraving
+          </div>
+          <h2 className="display" style={{ fontSize: 38, fontWeight: 500, fontStyle: 'italic', margin: 0 }}>{product.name}</h2>
+          <p style={{ marginTop: 6, color: 'var(--ink-soft)', fontSize: 14 }}>
+            What you see below is how your inscription will appear etched on the inside surface.
+          </p>
+
+          <div style={{
+            marginTop: 26,
+            position: 'relative',
+            background: '#dde3d4',
+            aspectRatio: cfg.productId === 'ring' ? '1/1' : '4/3',
+            overflow: 'hidden',
+          }}>
+            <img src={product.photo} alt={product.name}
+              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+            <div style={{
+              position: 'absolute', left: 18, bottom: 18,
+              background: 'rgba(245,240,232,0.94)',
+              padding: '8px 14px',
+              fontSize: 10, letterSpacing: '0.24em', textTransform: 'uppercase',
+              color: 'var(--ink-soft)',
+              display: 'flex', alignItems: 'center', gap: 10,
+            }}>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M2 11 Q7 2 12 11" stroke="currentColor" strokeWidth="1.2" />
+                <path d="M4 11 L4 13 M10 11 L10 13" stroke="currentColor" strokeWidth="1.2" />
+              </svg>
+              <span>Engraving on inside surface</span>
+            </div>
+          </div>
+
+          <div style={{ marginTop: 36 }}>
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              fontSize: 10.5, letterSpacing: '0.24em', textTransform: 'uppercase',
+              color: 'var(--ink-mute)', marginBottom: 12,
+            }}>
+              <span>Engraving (unrolled)</span>
+              <span>{product.insideLengthMm}mm available</span>
+            </div>
+            <InsideStrip product={product} content={cfg.content || 'your message'} font={cfg.font} size={cfg.size} />
+            <div style={{
+              marginTop: 14,
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              fontSize: 12, color: overflow ? 'var(--clay)' : 'var(--ink-mute)',
+            }}>
+              <span>{overflow ? 'Your inscription exceeds the engravable area — try a smaller size or shorter phrase.' : 'Tip: short phrases or initials engrave best.'}</span>
+              <span style={{ fontVariantNumeric: 'tabular-nums' }}>{len} / {product.insideMaxChars}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* RIGHT — controls */}
+        <div style={{
+          background: 'var(--cream-0)',
+          border: '1px solid var(--line-soft)',
+          padding: '32px 32px 28px',
+          boxShadow: 'var(--shadow-soft)',
+        }}>
+          <div style={{ fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: 'var(--ink-mute)', marginBottom: 6 }}>
+            Your message
+          </div>
+          <textarea
+            value={cfg.content}
+            onChange={e => setContent(e.target.value)}
+            placeholder="e.g. for my mother · 17.05.2026"
+            rows={2}
+            style={{
+              width: '100%',
+              border: 'none',
+              borderBottom: '1px solid var(--ink)',
+              background: 'transparent',
+              padding: '10px 0',
+              fontFamily: 'inherit',
+              fontSize: 18,
+              color: 'var(--ink)',
+              resize: 'none',
+              outline: 'none',
+            }}
+          />
+          <div style={{ fontSize: 11, color: 'var(--ink-mute)', marginTop: 4 }}>
+            Use <code style={{ background: 'var(--cream-1)', padding: '1px 5px', borderRadius: 3 }}>:star:</code>, <code style={{ background: 'var(--cream-1)', padding: '1px 5px', borderRadius: 3 }}>:moon:</code>, etc. to insert symbols, or use the icon tab below.
+          </div>
+
+          <div style={{ display: 'flex', gap: 0, marginTop: 32, borderBottom: '1px solid var(--line-soft)' }}>
+            {[['fonts','Fonts'], ['icons','Icons'], ['size','Size']].map(([id, label]) => (
+              <button key={id} onClick={() => setTab(id)} style={{
+                flex: 1,
+                padding: '10px 0',
+                background: 'transparent',
+                border: 'none',
+                borderBottom: tab === id ? '2px solid var(--ink)' : '2px solid transparent',
+                marginBottom: -1,
+                fontFamily: 'inherit',
+                fontSize: 11, letterSpacing: '0.24em', textTransform: 'uppercase',
+                color: tab === id ? 'var(--ink)' : 'var(--ink-mute)',
+                fontWeight: tab === id ? 600 : 400,
+                cursor: 'pointer',
+              }}>{label}</button>
+            ))}
+          </div>
+
+          <div style={{ paddingTop: 24, minHeight: 220 }}>
+            {tab === 'fonts' && (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+                {FONTS.map(f => {
+                  const on = cfg.font === f.id;
+                  return (
+                    <button key={f.id} onClick={() => setCfg({ ...cfg, font: f.id })} style={{
+                      padding: '18px 6px 12px',
+                      background: 'var(--cream-1)',
+                      border: on ? '1px solid var(--ink)' : '1px solid transparent',
+                      cursor: 'pointer',
+                      textAlign: 'center',
+                      transition: 'all 160ms ease',
+                    }}>
+                      <div style={{
+                        fontFamily: f.css,
+                        fontStyle: f.italic ? 'italic' : 'normal',
+                        fontWeight: f.weight,
+                        fontSize: 30 * (f.scale || 1),
+                        color: 'var(--ink)',
+                        lineHeight: 1,
+                        marginBottom: 8,
+                      }}>Aa</div>
+                      <div style={{
+                        fontSize: 9.5, letterSpacing: '0.16em', textTransform: 'uppercase',
+                        color: on ? 'var(--ink)' : 'var(--ink-mute)',
+                      }}>{f.name}</div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+            {tab === 'icons' && (
+              <div>
+                <div style={{ fontSize: 12, color: 'var(--ink-soft)', marginBottom: 14 }}>
+                  Tap an icon to insert it into your message.
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
+                  {ICONS.map(ic => (
+                    <button key={ic.id} onClick={() => addIcon(ic.id)} style={{
+                      padding: '16px 0 10px',
+                      background: 'var(--cream-1)',
+                      border: '1px solid transparent',
+                      cursor: 'pointer',
+                      textAlign: 'center',
+                      transition: 'all 160ms ease',
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--ink)'}
+                    onMouseLeave={e => e.currentTarget.style.borderColor = 'transparent'}
+                    >
+                      <IconGlyph id={ic.id} size={22} />
+                      <div style={{ fontSize: 9.5, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--ink-mute)', marginTop: 6 }}>
+                        {ic.label}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+            {tab === 'size' && (
+              <div>
+                <div style={{ fontSize: 12, color: 'var(--ink-soft)', marginBottom: 18 }}>
+                  Adjust the engraving size. Smaller is more discreet; larger reads more clearly.
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
+                  <span className="serif" style={{ fontSize: 14, color: 'var(--ink-mute)' }}>aa</span>
+                  <input type="range" min={14} max={36} step={1}
+                    value={cfg.size}
+                    onChange={e => setCfg({ ...cfg, size: +e.target.value })}
+                    style={{ flex: 1, accentColor: 'var(--sage)' }} />
+                  <span className="serif" style={{ fontSize: 28, color: 'var(--ink)' }}>Aa</span>
+                </div>
+                <div style={{ marginTop: 14, textAlign: 'center', fontSize: 13, color: 'var(--ink-soft)', fontVariantNumeric: 'tabular-nums' }}>
+                  {cfg.size}px
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div style={{
+            marginTop: 22, paddingTop: 18,
+            borderTop: '1px solid var(--line-soft)',
+            fontSize: 11.5, color: 'var(--ink-mute)', lineHeight: 1.55,
+          }}>
+            By personalizing, you agree not to use language or symbols that are profane, offensive, or infringe a third party's intellectual property. Engraved pieces are <strong style={{ color: 'var(--ink-soft)' }}>final sale</strong>.
+          </div>
+        </div>
+      </div>
+
+      <div style={{ marginTop: 36, display: 'flex', justifyContent: 'space-between' }}>
+        <GhostButton onClick={onBack}>← Back</GhostButton>
+        <PrimaryButton onClick={onNext} disabled={overflow || !cfg.content.trim()}>
+          Save & review →
+        </PrimaryButton>
+      </div>
+    </div>
+  );
+}
+
+// =============================================================================
+// STEP 3 — Review / Order Summary
+// =============================================================================
+function StepReview({ cfg, onBack, onConfirm }) {
+  const product = PRODUCTS[cfg.productId];
+  const engravingFee = 20;
+  const subtotal = product.price + engravingFee;
+  const shipping = subtotal >= 75 ? 0 : 8;
+  const tax = +(subtotal * 0.08).toFixed(2);
+  const total = subtotal + shipping + tax;
+
+  return (
+    <div style={{ padding: '48px 64px 32px', maxWidth: 1180, margin: '0 auto' }}>
+      <div style={{ textAlign: 'center', marginBottom: 38 }}>
+        <h2 className="display" style={{ fontSize: 42, fontWeight: 500, fontStyle: 'italic', margin: 0 }}>One last look</h2>
+        <p style={{ marginTop: 10, color: 'var(--ink-soft)', fontSize: 14 }}>Review your piece before adding it to the bag.</p>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: 56 }}>
+        <div>
+          <div style={{
+            position: 'relative',
+            background: '#dde3d4',
+            aspectRatio: '4/3',
+            overflow: 'hidden',
+          }}>
+            <img src={product.photo} alt={product.name}
+              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+          </div>
+          <div style={{ marginTop: 28 }}>
+            <div style={{ fontSize: 10.5, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'var(--ink-mute)', marginBottom: 12 }}>
+              Inside engraving · final preview
+            </div>
+            <InsideStrip product={product} content={cfg.content} font={cfg.font} size={cfg.size} />
+          </div>
+        </div>
+
+        <div style={{
+          background: 'var(--cream-0)',
+          padding: '32px 32px 26px',
+          border: '1px solid var(--line-soft)',
+        }}>
+          <div style={{ fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: 'var(--ink-mute)', marginBottom: 18 }}>
+            Order summary
+          </div>
+
+          <div style={{ display: 'flex', gap: 14, paddingBottom: 20, borderBottom: '1px solid var(--line-soft)' }}>
+            <div style={{ width: 80, height: 80, background: '#dde3d4', flexShrink: 0, overflow: 'hidden' }}>
+              <img src={product.photo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div className="display" style={{ fontSize: 18, fontWeight: 500 }}>{product.name}</div>
+              <div style={{ fontSize: 12, color: 'var(--ink-mute)', marginTop: 2 }}>{product.subtitle}</div>
+              <div style={{ marginTop: 8, fontSize: 12, color: 'var(--ink-soft)' }}>
+                <span style={{ color: 'var(--ink-mute)' }}>Inside:</span>{' '}
+                <ContentTokens content={cfg.content} font={cfg.font} size={14} color="var(--ink)" />
+              </div>
+            </div>
+            <div className="serif" style={{ fontSize: 18, fontWeight: 500 }}>${product.price}</div>
+          </div>
+
+          <div style={{ padding: '20px 0', borderBottom: '1px solid var(--line-soft)', display: 'grid', gap: 8, fontSize: 13.5 }}>
+            <SummaryRow label="Subtotal [ 1 item ]" value={`$${product.price}.00`} />
+            <SummaryRow label="Engraving [ 1 item ]" value={`$${engravingFee}.00`} />
+            <SummaryRow label="Shipping" value={shipping === 0 ? <span style={{ color: 'var(--sage)' }}>FREE</span> : `$${shipping}.00`} />
+            <SummaryRow label="Estimated tax" value={`$${tax.toFixed(2)}`} />
+          </div>
+
+          <div style={{ padding: '22px 0 8px', display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+            <span style={{ fontSize: 13, letterSpacing: '0.12em', textTransform: 'uppercase' }}>Estimated total</span>
+            <span className="display" style={{ fontSize: 30, fontWeight: 500 }}>${total.toFixed(2)}</span>
+          </div>
+
+          <div style={{ display: 'grid', gap: 10, marginTop: 18 }}>
+            <SecondaryButton onClick={onConfirm} style={{ width: '100%', padding: '16px 0' }}>
+              Add to Cart
+            </SecondaryButton>
+            <PrimaryButton onClick={onConfirm} style={{ width: '100%', padding: '16px 0' }}>
+              Buy Now
+            </PrimaryButton>
+          </div>
+
+          <div style={{ marginTop: 22, display: 'grid', gap: 10, fontSize: 12, color: 'var(--ink-soft)' }}>
+            <PerkRow icon="card">Pay as little as ${(total/4).toFixed(0)} today</PerkRow>
+            <PerkRow icon="truck">Free standard shipping on orders $75+</PerkRow>
+            <PerkRow icon="leaf">Hand-finished in Hội An · 7–10 days to ship</PerkRow>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ marginTop: 40, display: 'flex', justifyContent: 'space-between' }}>
+        <GhostButton onClick={onBack}>← Edit engraving</GhostButton>
+      </div>
+    </div>
+  );
+}
+
+function SummaryRow({ label, value }) {
+  return (
+    <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--ink-soft)' }}>
+      <span>{label}</span>
+      <span style={{ color: 'var(--ink)' }}>{value}</span>
+    </div>
+  );
+}
+
+function PerkRow({ icon, children }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+      <div style={{
+        width: 24, height: 24,
+        border: '1px solid var(--line)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        color: 'var(--sage)', fontSize: 12,
+      }}>
+        {icon === 'card' && '⎘'}
+        {icon === 'truck' && '⇄'}
+        {icon === 'leaf' && '✿'}
+      </div>
+      <span>{children}</span>
+    </div>
+  );
+}
+
+// =============================================================================
+// Confirmation screen
+// =============================================================================
+function StepConfirm({ cfg, onRestart }) {
+  const product = PRODUCTS[cfg.productId];
+  return (
+    <div style={{ padding: '100px 64px', maxWidth: 720, margin: '0 auto', textAlign: 'center' }}>
+      <div className="script" style={{ fontSize: 84, color: 'var(--sage)', lineHeight: 1 }}>thank you</div>
+      <h2 className="display" style={{ fontSize: 34, fontWeight: 500, fontStyle: 'italic', marginTop: 12 }}>Your piece is on the bench.</h2>
+      <p style={{ color: 'var(--ink-soft)', marginTop: 14, fontSize: 14.5, lineHeight: 1.6 }}>
+        Your {product.name} has been added to your bag. Our artisans in Hội An will hand-engrave your inscription before it ships — expect 7–10 days.
+      </p>
+      <div style={{ marginTop: 32 }}>
+        <InsideStrip product={product} content={cfg.content} font={cfg.font} size={cfg.size} />
+      </div>
+      <div style={{ marginTop: 40, display: 'flex', gap: 14, justifyContent: 'center' }}>
+        <GhostButton onClick={onRestart}>Personalize another</GhostButton>
+        <PrimaryButton onClick={() => {}}>Go to bag</PrimaryButton>
+      </div>
+    </div>
+  );
+}
+
+Object.assign(window, {
+  Stepper, Chip, PrimaryButton, SecondaryButton, GhostButton,
+  StepProduct, StepEngrave, StepReview, StepConfirm,
+});
+  </script>
+
+  <!-- app: header, hero, stepper variants, footer, root -->
+  <script type="text/babel">
+const { useState, useEffect } = React;
+
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "accent": "#7D8B5E",
+  "bg": "#F5F0E8",
+  "headerStyle": "wordmark",
+  "stepperStyle": "numbers",
+  "previewSurface": "silver"
+}/*EDITMODE-END*/;
+
+function Header() {
+  const NAV_ITEMS = [
+    { id: 'home',     label: 'Home' },
+    { id: 'customize',label: 'Customization' },
+    { id: 'all',      label: 'All Product' },
+    { id: 'gift',     label: 'Gift Center' },
+    { id: 'info',     label: 'Information & Instruction' },
+    { id: 'story',    label: 'Our Story' },
+    { id: 'contact',  label: 'Contact Us' },
+  ];
+  const active = 'customize';
+  return (
+    <header style={{
+      background: 'var(--olive)',
+      position: 'sticky', top: 0, zIndex: 10,
+      borderBottom: '1px solid rgba(0,0,0,0.08)',
+    }}>
+      <div style={{
+        maxWidth: 1340,
+        margin: '0 auto',
+        padding: '0 32px',
+        minHeight: 72,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 20,
+      }}>
+        {/* PRIMARY NAV */}
+        <nav style={{
+          display: 'flex', alignItems: 'center',
+          flex: 1,
+          color: '#fff',
+          fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase',
+          fontWeight: 500,
+        }}>
+          {NAV_ITEMS.map((item, i) => (
+            <React.Fragment key={item.id}>
+              {i > 0 && <span aria-hidden="true" style={{
+                display: 'inline-block', width: 1, height: 14,
+                background: 'rgba(255,255,255,0.4)', margin: '0 18px',
+              }} />}
+              <a href="#" style={{
+                color: item.id === active ? 'rgba(255,255,255,0.55)' : '#fff',
+                textDecoration: 'none',
+                padding: '6px 0',
+                whiteSpace: 'nowrap',
+              }}>{item.label}</a>
+            </React.Fragment>
+          ))}
+        </nav>
+
+        {/* SHOP NOW pill */}
+        <a href="#" style={{
+          background: '#000',
+          color: '#fff',
+          padding: '12px 22px',
+          fontSize: 11, letterSpacing: '0.24em', textTransform: 'uppercase',
+          fontWeight: 600, textDecoration: 'none',
+        }}>Shop Now</a>
+
+        {/* LOG IN + BAG */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
+          <a href="#" style={{
+            color: '#fff', textDecoration: 'none',
+            display: 'flex', alignItems: 'center', gap: 8,
+            fontSize: 11, letterSpacing: '0.14em',
+          }}>
+            <span style={{ textTransform: 'capitalize' }}>Log In</span>
+            <span style={{
+              width: 22, height: 22, borderRadius: '50%',
+              background: 'rgba(0,0,0,0.25)',
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.6">
+                <circle cx="12" cy="9" r="3.2" />
+                <path d="M5 19c1.5-3.4 4.3-5 7-5s5.5 1.6 7 5" />
+              </svg>
+            </span>
+          </a>
+          <a href="#" style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#fff', textDecoration: 'none' }}>
+            <svg width="22" height="24" viewBox="0 0 22 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+              <path d="M3 8h16l-1.3 13.4a2 2 0 0 1-2 1.8H6.3a2 2 0 0 1-2-1.8L3 8Z" />
+              <path d="M7.5 8a3.5 3.5 0 0 1 7 0" />
+            </svg>
+            <span style={{ fontSize: 12, fontVariantNumeric: 'tabular-nums' }}>0</span>
+          </a>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+function PageHero({ title, kicker, subtitle }) {
+  return (
+    <section style={{
+      background: 'var(--olive)',
+      color: '#fff',
+      padding: '56px 32px 64px',
+      textAlign: 'center',
+    }}>
+      <div style={{ maxWidth: 920, margin: '0 auto' }}>
+        {kicker && (
+          <div style={{
+            fontSize: 12, letterSpacing: '0.32em', textTransform: 'uppercase',
+            color: 'rgba(255,255,255,0.78)', marginBottom: 12,
+          }}>{kicker}</div>
+        )}
+        <h1 className="display" style={{
+          margin: 0,
+          fontStyle: 'italic', fontWeight: 500,
+          fontSize: 'clamp(48px, 6vw, 76px)',
+          lineHeight: 1.05,
+          letterSpacing: '0.005em',
+        }}>{title}</h1>
+        {subtitle && (
+          <p style={{
+            marginTop: 18,
+            color: 'rgba(255,255,255,0.92)',
+            fontSize: 14.5, lineHeight: 1.65,
+            maxWidth: 640, marginLeft: 'auto', marginRight: 'auto',
+          }}>{subtitle}</p>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function StepperBar({ steps, current, style }) {
+  if (style === 'dots') {
+    return (
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        gap: 18, padding: '24px 0',
+        borderTop: '1px solid var(--line-soft)',
+        borderBottom: '1px solid var(--line-soft)',
+      }}>
+        {steps.map((s, i) => {
+          const active = i === current;
+          const done = i < current;
+          return (
+            <div key={s} style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{
+                  width: active ? 10 : 6, height: active ? 10 : 6, borderRadius: '50%',
+                  background: active ? 'var(--ink)' : done ? 'var(--sage)' : 'var(--line)',
+                  transition: 'all 200ms ease',
+                }} />
+                <div style={{
+                  fontSize: 11.5, letterSpacing: '0.18em', textTransform: 'uppercase',
+                  color: active ? 'var(--ink)' : done ? 'var(--ink-soft)' : 'var(--ink-mute)',
+                  fontWeight: active ? 600 : 400,
+                }}>{s}</div>
+              </div>
+              {i < steps.length - 1 && <div style={{ width: 32, height: 1, background: 'var(--line)' }} />}
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+  if (style === 'line') {
+    const pct = (current / (steps.length - 1)) * 100;
+    return (
+      <div style={{ padding: '24px 0', borderTop: '1px solid var(--line-soft)', borderBottom: '1px solid var(--line-soft)' }}>
+        <div style={{ maxWidth: 760, margin: '0 auto', padding: '0 32px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
+            {steps.map((s, i) => (
+              <div key={s} style={{
+                fontSize: 11, letterSpacing: '0.18em', textTransform: 'uppercase',
+                color: i <= current ? 'var(--ink)' : 'var(--ink-mute)',
+                fontWeight: i === current ? 600 : 400,
+              }}>{s}</div>
+            ))}
+          </div>
+          <div style={{ position: 'relative', height: 2, background: 'var(--line)' }}>
+            <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${pct}%`, background: 'var(--sage)', transition: 'width 360ms ease' }} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+  return <Stepper steps={steps} current={current} />;
+}
+
+function FooterCol({ title, children }) {
+  return (
+    <div>
+      <div className="display" style={{
+        fontStyle: 'italic',
+        fontSize: 22, fontWeight: 500,
+        color: 'var(--ink)',
+        marginBottom: 18,
+        letterSpacing: '0.01em',
+      }}>{title}</div>
+      {children}
+    </div>
+  );
+}
+
+function Hours({ day, time }) {
+  return (
+    <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16 }}>
+      <span style={{ color: 'var(--ink)' }}>{day}</span>
+      <span style={{ color: 'var(--ink-soft)', fontVariantNumeric: 'tabular-nums' }}>{time}</span>
+    </div>
+  );
+}
+
+function App() {
+  const [tweaks, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  const [step, setStep] = useState(0);
+  const [cfg, setCfg] = useState({
+    productId: 'bracelet',
+    content: 'mãi mãi',
+    font: 'italic',
+    size: 22,
+  });
+
+  useEffect(() => {
+    document.documentElement.style.setProperty('--sage', tweaks.accent);
+    document.documentElement.style.setProperty('--cream-0', tweaks.bg);
+  }, [tweaks.accent, tweaks.bg]);
+
+  const steps = ['Choose', 'Engrave', 'Review'];
+
+  return (
+    <div style={{ minHeight: '100vh', background: 'var(--cream-0)' }}>
+      <Header />
+      {step < 3 && (
+        <PageHero
+          kicker="Customization"
+          title="Make it yours"
+          subtitle={'A name. A date. A quiet phrase, etched on the inside surface — where only the wearer finds it. Wear pearl, feel special, stay narrative.'}
+        />
+      )}
+      {step < 3 && <StepperBar steps={steps} current={step} style={tweaks.stepperStyle} />}
+
+      {step === 0 && (
+        <StepProduct cfg={cfg}
+          setCfg={c => setCfg({ ...cfg, productId: c.productId })}
+          onNext={() => setStep(1)} />
+      )}
+      {step === 1 && (
+        <StepEngrave cfg={cfg} setCfg={setCfg}
+          onBack={() => setStep(0)}
+          onNext={() => setStep(2)} />
+      )}
+      {step === 2 && (
+        <StepReview cfg={cfg}
+          onBack={() => setStep(1)}
+          onConfirm={() => setStep(3)} />
+      )}
+      {step === 3 && (
+        <StepConfirm cfg={cfg} onRestart={() => setStep(0)} />
+      )}
+
+      <footer style={{ marginTop: 96 }}>
+        <div style={{
+          background: 'var(--cream-0)',
+          borderTop: '1px solid var(--line-soft)',
+          padding: '56px 32px 28px',
+        }}>
+          <div style={{
+            maxWidth: 1180, margin: '0 auto',
+            display: 'grid', gridTemplateColumns: '1fr 1fr 1.2fr', gap: 56,
+            alignItems: 'start',
+          }}>
+            <FooterCol title="Contact">
+              <div style={{ display: 'grid', gap: 8, fontSize: 13, color: 'var(--ink-soft)', lineHeight: 1.55 }}>
+                <div>2/6 Nguyễn Phúc Chu St,<br />Minh An Ward, Hội An City.</div>
+                <div><span style={{ color: 'var(--ink-mute)' }}>Tel:</span> 0784883756</div>
+                <div><span style={{ color: 'var(--ink-mute)' }}>Email:</span> pearspective@gmail.com</div>
+              </div>
+            </FooterCol>
+
+            <FooterCol title="Opening Hours">
+              <div style={{ display: 'grid', gap: 6, fontSize: 13, color: 'var(--ink-soft)', lineHeight: 1.55 }}>
+                <Hours day="Mon – Thurs" time="9:00am – 8:00pm" />
+                <Hours day="Friday" time="9:00am – 8:00pm" />
+                <Hours day="Saturday" time="9:00am – 8:00pm" />
+                <Hours day="Sunday" time="9:00am – 3:00pm" />
+              </div>
+            </FooterCol>
+
+            <FooterCol title="Stay Updated">
+              <div style={{ fontSize: 13, color: 'var(--ink-soft)', marginBottom: 14, lineHeight: 1.55 }}>
+                Slow updates from the bench in Hội An — new pieces, restocks, and a little story behind each design.
+              </div>
+              <form onSubmit={e => e.preventDefault()} style={{ display: 'flex', gap: 0, border: '1px solid var(--line)', background: 'var(--cream-0)' }}>
+                <input
+                  type="email"
+                  placeholder="Enter your email here *"
+                  style={{
+                    flex: 1,
+                    border: 'none',
+                    background: 'transparent',
+                    padding: '12px 14px',
+                    fontFamily: 'inherit',
+                    fontSize: 13,
+                    color: 'var(--ink)',
+                    outline: 'none',
+                  }}
+                />
+                <button type="submit" style={{
+                  background: '#000',
+                  color: '#fff',
+                  border: 'none',
+                  padding: '0 22px',
+                  fontFamily: 'inherit',
+                  fontSize: 10.5, letterSpacing: '0.24em', textTransform: 'uppercase',
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                }}>Subscribe</button>
+              </form>
+              <label style={{
+                display: 'flex', alignItems: 'flex-start', gap: 8,
+                marginTop: 12, fontSize: 12, color: 'var(--ink-soft)', lineHeight: 1.5,
+              }}>
+                <input type="checkbox" defaultChecked style={{ marginTop: 2, accentColor: 'var(--sage)' }} />
+                <span>Yes, subscribe me to your newsletter.</span>
+              </label>
+            </FooterCol>
+          </div>
+
+          <div style={{
+            maxWidth: 1180, margin: '48px auto 0', paddingTop: 22,
+            borderTop: '1px solid var(--line)',
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 20,
+            flexWrap: 'wrap',
+            fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase',
+            color: 'var(--ink-mute)',
+          }}>
+            <div className="display" style={{
+              fontStyle: 'italic', fontSize: 18, letterSpacing: '0.02em',
+              textTransform: 'none', color: 'var(--ink)',
+            }}>PearSpective</div>
+            <div>© 2026 PearSpective · Hand-crafted in Hội An, Vietnam</div>
+            <div style={{ display: 'flex', gap: 14 }}>
+              <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Instagram</a>
+              <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Facebook</a>
+              <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Pinterest</a>
+            </div>
+          </div>
+        </div>
+      </footer>
+
+      <TweaksPanel title="Tweaks">
+        <TweakSection label="Brand">
+          <TweakColor
+            label="Accent"
+            value={tweaks.accent}
+            options={['#7D8B5E', '#7A5C3B', '#3F5560', '#7C4A4A']}
+            onChange={v => setTweak('accent', v)}
+          />
+          <TweakColor
+            label="Background"
+            value={tweaks.bg}
+            options={['#F5F0E8', '#ECE5D6', '#EFE7D3', '#FFFFFF']}
+            onChange={v => setTweak('bg', v)}
+          />
+        </TweakSection>
+        <TweakSection label="Layout">
+          <TweakRadio
+            label="Wordmark"
+            value={tweaks.headerStyle}
+            options={[
+              { value: 'wordmark', label: 'Serif' },
+              { value: 'script', label: 'Script' },
+            ]}
+            onChange={v => setTweak('headerStyle', v)}
+          />
+          <TweakSelect
+            label="Stepper"
+            value={tweaks.stepperStyle}
+            options={[
+              { value: 'numbers', label: 'Numbered circles' },
+              { value: 'dots', label: 'Minimal dots' },
+              { value: 'line', label: 'Progress line' },
+            ]}
+            onChange={v => setTweak('stepperStyle', v)}
+          />
+        </TweakSection>
+        <TweakSection label="Demo">
+          <div style={{ display: 'grid', gap: 8 }}>
+            {['Choose', 'Engrave', 'Review', 'Confirmation'].map((s, i) => (
+              <button key={s} onClick={() => setStep(i)} style={{
+                padding: '8px 12px',
+                background: step === i ? '#2A2620' : 'transparent',
+                color: step === i ? '#fff' : '#2A2620',
+                border: '1px solid #d9d0bd',
+                fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase',
+                cursor: 'pointer',
+                textAlign: 'left',
+              }}>{i + 1}. {s}</button>
+            ))}
+          </div>
+        </TweakSection>
+      </TweaksPanel>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
