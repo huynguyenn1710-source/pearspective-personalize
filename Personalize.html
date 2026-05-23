@@ -508,23 +508,23 @@ Object.assign(window, {
 const PRODUCTS = {
   bracelet: {
     id: 'bracelet',
-    name: 'Hà · Mother-of-Pearl Cuff',
+    name: 'Vệt Nắng Sau Mưa - Bracelet',
     subtitle: 'Sterling silver · Hand-set nacre',
     photo: 'assets/bracelet.jpg',
-    price: 168,
+    price: 149000,
     insideLengthMm: 58,
-    insideMaxChars: 22,
+    insideMaxChars: 16,
     sides: ['INSIDE'],
     description: 'Cast in sterling silver with an organic molten silhouette. A single nacre stone holds a constellation of hand-pricked stars.',
   },
   ring: {
     id: 'ring',
-    name: 'Vũ · Mother-of-Pearl Signet Ring',
+    name: 'Cánh Vũ - Ring',
     subtitle: 'Sterling silver · Adjustable band',
     photo: 'assets/ring.jpg',
-    price: 96,
+    price: 129000,
     insideLengthMm: 38,
-    insideMaxChars: 16,
+    insideMaxChars: 7,
     sides: ['INSIDE'],
     description: 'A cast silver band with the same liquid-silver texture and a smaller nacre cabochon. Adjustable. Engraving sits along the inside band.',
   },
@@ -869,7 +869,7 @@ function StepProduct({ cfg, setCfg, onNext }) {
                   <div className="display" style={{ fontSize: 22, fontWeight: 500 }}>{p.name}</div>
                   <div style={{ marginTop: 4, fontSize: 12, color: 'var(--ink-mute)', letterSpacing: '0.06em' }}>{p.subtitle}</div>
                 </div>
-                <div className="serif" style={{ fontSize: 22, fontWeight: 500 }}>${p.price}</div>
+                <div className="serif" style={{ fontSize: 22, fontWeight: 500 }}>{p.price.toLocaleString('vi-VN')}₫</div>
               </div>
               <p style={{ marginTop: 10, color: 'var(--ink-soft)', fontSize: 13.5, lineHeight: 1.55 }}>
                 {p.description}
@@ -1174,19 +1174,19 @@ function StepReview({ cfg, onBack, onConfirm }) {
                 <ContentTokens content={cfg.content} font={cfg.font} size={14} color="var(--ink)" />
               </div>
             </div>
-            <div className="serif" style={{ fontSize: 18, fontWeight: 500 }}>${product.price}</div>
+            <div className="serif" style={{ fontSize: 18, fontWeight: 500 }}>{product.price.toLocaleString('vi-VN')}₫</div>
           </div>
 
           <div style={{ padding: '20px 0', borderBottom: '1px solid var(--line-soft)', display: 'grid', gap: 8, fontSize: 13.5 }}>
-            <SummaryRow label="Subtotal [ 1 item ]" value={`$${product.price}.00`} />
-            <SummaryRow label="Engraving [ 1 item ]" value={`$${engravingFee}.00`} />
-            <SummaryRow label="Shipping" value={shipping === 0 ? <span style={{ color: 'var(--sage)' }}>FREE</span> : `$${shipping}.00`} />
-            <SummaryRow label="Estimated tax" value={`$${tax.toFixed(2)}`} />
+            <SummaryRow label="Subtotal [ 1 item ]" value={`${product.price.toLocaleString('vi-VN')}₫`} />
+            <SummaryRow label="Engraving [ 1 item ]" value={`${engravingFee.toLocaleString('vi-VN')}₫`} />
+            <SummaryRow label="Shipping" value={shipping === 0 ? <span style={{ color: 'var(--sage)' }}>FREE</span> : `${shipping.toLocaleString('vi-VN')}₫`} />
+            <SummaryRow label="Estimated tax" value={`${Math.round(tax).toLocaleString('vi-VN')}₫`} />
           </div>
 
           <div style={{ padding: '22px 0 8px', display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
             <span style={{ fontSize: 13, letterSpacing: '0.12em', textTransform: 'uppercase' }}>Estimated total</span>
-            <span className="display" style={{ fontSize: 30, fontWeight: 500 }}>${total.toFixed(2)}</span>
+            <span className="display" style={{ fontSize: 30, fontWeight: 500 }}>{Math.round(total).toLocaleString('vi-VN')}₫</span>
           </div>
 
           <div style={{ display: 'grid', gap: 10, marginTop: 18 }}>
@@ -1199,9 +1199,9 @@ function StepReview({ cfg, onBack, onConfirm }) {
           </div>
 
           <div style={{ marginTop: 22, display: 'grid', gap: 10, fontSize: 12, color: 'var(--ink-soft)' }}>
-            <PerkRow icon="card">Pay as little as ${(total/4).toFixed(0)} today</PerkRow>
-            <PerkRow icon="truck">Free standard shipping on orders $75+</PerkRow>
-            <PerkRow icon="leaf">Hand-finished in Hội An · 7–10 days to ship</PerkRow>
+            <PerkRow icon="card">Pay as little as {Math.round(total/4).toLocaleString('vi-VN')}₫ today</PerkRow>
+            <PerkRow icon="truck">Free standard shipping on orders 500.000₫+</PerkRow>
+            <PerkRow icon="leaf">Hand-finished in Chuyên Mỹ · 7–10 days to ship</PerkRow>
           </div>
         </div>
       </div>
