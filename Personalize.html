@@ -1507,7 +1507,6 @@ function App() {
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--cream-0)' }}>
-      <Header />
       {step < 3 && (
         <PageHero
           kicker="Customization"
@@ -1535,96 +1534,6 @@ function App() {
       {step === 3 && (
         <StepConfirm cfg={cfg} onRestart={() => setStep(0)} />
       )}
-
-      <footer style={{ marginTop: 96 }}>
-        <div style={{
-          background: 'var(--cream-0)',
-          borderTop: '1px solid var(--line-soft)',
-          padding: '56px 32px 28px',
-        }}>
-          <div style={{
-            maxWidth: 1180, margin: '0 auto',
-            display: 'grid', gridTemplateColumns: '1fr 1fr 1.2fr', gap: 56,
-            alignItems: 'start',
-          }}>
-            <FooterCol title="Contact">
-              <div style={{ display: 'grid', gap: 8, fontSize: 13, color: 'var(--ink-soft)', lineHeight: 1.55 }}>
-                <div>2/6 Nguyễn Phúc Chu St,<br />Minh An Ward, Hội An City.</div>
-                <div><span style={{ color: 'var(--ink-mute)' }}>Tel:</span> 0784883756</div>
-                <div><span style={{ color: 'var(--ink-mute)' }}>Email:</span> pearspective@gmail.com</div>
-              </div>
-            </FooterCol>
-
-            <FooterCol title="Opening Hours">
-              <div style={{ display: 'grid', gap: 6, fontSize: 13, color: 'var(--ink-soft)', lineHeight: 1.55 }}>
-                <Hours day="Mon – Thurs" time="9:00am – 8:00pm" />
-                <Hours day="Friday" time="9:00am – 8:00pm" />
-                <Hours day="Saturday" time="9:00am – 8:00pm" />
-                <Hours day="Sunday" time="9:00am – 3:00pm" />
-              </div>
-            </FooterCol>
-
-            <FooterCol title="Stay Updated">
-              <div style={{ fontSize: 13, color: 'var(--ink-soft)', marginBottom: 14, lineHeight: 1.55 }}>
-                Slow updates from the bench in Hội An — new pieces, restocks, and a little story behind each design.
-              </div>
-              <form onSubmit={e => e.preventDefault()} style={{ display: 'flex', gap: 0, border: '1px solid var(--line)', background: 'var(--cream-0)' }}>
-                <input
-                  type="email"
-                  placeholder="Enter your email here *"
-                  style={{
-                    flex: 1,
-                    border: 'none',
-                    background: 'transparent',
-                    padding: '12px 14px',
-                    fontFamily: 'inherit',
-                    fontSize: 13,
-                    color: 'var(--ink)',
-                    outline: 'none',
-                  }}
-                />
-                <button type="submit" style={{
-                  background: '#000',
-                  color: '#fff',
-                  border: 'none',
-                  padding: '0 22px',
-                  fontFamily: 'inherit',
-                  fontSize: 10.5, letterSpacing: '0.24em', textTransform: 'uppercase',
-                  fontWeight: 500,
-                  cursor: 'pointer',
-                }}>Subscribe</button>
-              </form>
-              <label style={{
-                display: 'flex', alignItems: 'flex-start', gap: 8,
-                marginTop: 12, fontSize: 12, color: 'var(--ink-soft)', lineHeight: 1.5,
-              }}>
-                <input type="checkbox" defaultChecked style={{ marginTop: 2, accentColor: 'var(--sage)' }} />
-                <span>Yes, subscribe me to your newsletter.</span>
-              </label>
-            </FooterCol>
-          </div>
-
-          <div style={{
-            maxWidth: 1180, margin: '48px auto 0', paddingTop: 22,
-            borderTop: '1px solid var(--line)',
-            display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 20,
-            flexWrap: 'wrap',
-            fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase',
-            color: 'var(--ink-mute)',
-          }}>
-            <div className="display" style={{
-              fontStyle: 'italic', fontSize: 18, letterSpacing: '0.02em',
-              textTransform: 'none', color: 'var(--ink)',
-            }}>PearSpective</div>
-            <div>© 2026 PearSpective · Hand-crafted in Hội An, Vietnam</div>
-            <div style={{ display: 'flex', gap: 14 }}>
-              <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Instagram</a>
-              <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Facebook</a>
-              <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Pinterest</a>
-            </div>
-          </div>
-        </div>
-      </footer>
 
       <TweaksPanel title="Tweaks">
         <TweakSection label="Brand">
